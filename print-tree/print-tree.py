@@ -23,7 +23,6 @@ indentation = 4
 #         subindent = ' ' * 4 * (level + 1)
 #         for f in files:
 #             print('{}{}'.format(subindent, f))
-
 # def printtree(start, typ, level: int = -1, limit_to_directories: bool = False,
 #               length_limit: int = 1000):
 #     """Given a directory Path object print a visual tree structure"""
@@ -98,25 +97,35 @@ indentation = 4
 #             print
 #             line
 #
-
 def walkdir(start, typ):
-    print("searching starting:", start)
-    file_name_filter = typ
+    # f"{project_name}" if export_path is None else export_path
+    if typ is None:
+        print("Found None")
+        file_name_filter = ""
+    else:
+        file_name_filter = "." + typ
+    abs_start_path = os.path.abspath(start)
+    print("print directory tree starting at:", abs_start_path)
+    print("filter for files of type:", file_name_filter)
+
     tree = []
     for root, dirs, files in os.walk(start):
         # print(root, dirs, files)
         level = root.replace(start, '').count(os.sep)
-        indent = ' ' * indentation * (level)
+        indent = ' ' * indentation * level
         print("root:", root)
         print("dirs:", dirs)
         print("files:", files)
         print("level:", level)
+
+        # print("Creating tree\n\n")
         # select file name
         for file in files:
             # check the extension of files
-            if file.endswith('.typ'):
+            if file.endswith(file_name_filter):
                 # print whole path of files
-                print(os.path.join(root, file))
+                # print(os.path.join(root, file))
+                print(''.join([indent,file]))
 
 
 if __name__ == "__main__":

@@ -1,12 +1,24 @@
+"""Various functions for working on directories
 
+These functions contain utilizes for analyzing directory/paths on an OS.
+
+This file can also be imported as a module and contains the following
+functions:
+
+    * recursive_iterdir - returns a list of directories and subdirectories.
+    * recursive_iterdir_gen - returns a list of directories and subdirectories as an iterative function
+    * main - the main function of the script
+"""
 import os
 import argparse
 from pathlib import Path
+from typing import List
 from pprint import pp
 
 # use suffixes if more than one suffix (e.g. .tar.gz) NOTE: returns an array
 all_suffixes = Path('my/library.tar.gz').suffixes
 # all_suffixes = ['.tar', '.gz']
+filter_suffixes = [".py", ".md"]
 
 # to create a single string with all extensions
 # file_type_extension = join(all_suffixes.suffixes)
@@ -18,22 +30,35 @@ all_suffixes_no_file = Path('my/library').suffixes
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 
-# Function that will list all files of a certain type for directory and child directories.
+def recursive_iterdir(path: Path) -> list:
+    """recursively iterates over the provided path location
 
+    Args:
+        path(Path): The starting directory path location
 
-def recursive_iterdir(path: Path):
-    items = []
+    Returns:
+        items(List): A list of the directories
+    """
+    items = list()
     for item in path.iterdir():
-        items.append(item)
+        if item.suffix in filter_suffixes:
+            items.append(item)
         if item.is_dir():
             items.extend(recursive_iterdir(item))
-
     return items
 
 
 def recursive_iterdir_gen(path: Path):
+    """recursively iterates over the provided path location
+
+    This function works as an iterative function that can be used in loops
+
+    Args:
+        path(Path): The starting directory path location
+    """
     for item in path.iterdir():
-        yield item
+        if item.suffix in filter_suffixes:
+            yield item
         if item.is_dir():
             yield from recursive_iterdir_gen(item)
 
@@ -45,10 +70,9 @@ def main():
     args = parser.parse_args()
     # Create a Path object
     starting_dir = Path(args.start_dir)
-    pp(list(starting_dir.iterdir()))
-
-
-    #get_spreadsheet_cols(args.input_file, print_cols=True)
+    #pp(list(starting_dir.iterdir()))
+    for files in recursive_iterdir_gen(starting_dir):
+        print(files)
 
 if __name__ == "__main__":
     main()
